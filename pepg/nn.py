@@ -4,6 +4,13 @@ from typing import Callable, List
 import numpy as np
 
 
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def tanh(x):
+    return np.tanh(x)
+
+
 class NeuralNetwork(object):
     def __init__(self, input_size:int, output_size: int, hidden_sizes: List[int] = [],
                  hidden_activation: Callable[[float], float] = lambda x: x,
@@ -22,7 +29,7 @@ class NeuralNetwork(object):
             number_of_parameters += sizes[i] * sizes[i+1]
         if bias:
             number_of_parameters += np.sum(sizes[1:])
-        self.number_of_parameters: int = number_of_parameters
+        self.number_of_parameters: int = int(number_of_parameters)
         self.sizes = sizes.astype('int')
 
         self._weights = None

@@ -6,6 +6,8 @@ from functools import lru_cache
 
 import numpy as np
 
+from .optimizers import Adam, Optimizer
+
 
 @lru_cache(maxsize=1)
 def utility_function(population_size: int) -> List[float]:
@@ -27,34 +29,11 @@ def fitness_transformation(fitness_scores: List[float]) -> List[float]:
     return utility[ranks]
 
 
-class Adam():
-    def __init__(self, parameters_size: int, alpha: float,
-                 beta_1: float = 0.9, beta_2: float = 0.999,
-                 epsilon: float = 1e-08):
-
-        self.alpha = alpha
-        self.beta_1 = beta_1
-        self.beta_2 = beta_2
-        self.epsilon = epsilon
-
-        self.t = 0
-        self.m = np.zeros(parameters_size)
-        self.v = np.zeros(parameters_size)
-
-    def __call__(self, gradients):
-        self.t += 1
-        alpha = self.alpha * (np.sqrt(1 - np.power(self.beta_2, self.t)) /
-                              (1 - np.power(self.beta_1, self.t)))
-        self.m = self.beta_1 * self.m + (1 - self.beta_1) * gradients
-        self.v = self.beta_2 * self.v + (1 - self.beta_2) * np.square(gradients)
-        return -alpha * self.m / (np.sqrt(self.v) + self.epsilon)
-
-
 class PEPG():
     def __init__(self, population_size: int, theta_size: int,
                  mu_init: float, sigma_init: float, mu_lr: float,
                  sigma_lr: float, l2_coeff: float = 0.005,
-                 optimizer = Adam):
+                 optimizer = Adam, optimizer_kwargs = {}):
         self.population_size: int = population_size
         self.theta_size: int = theta_size
         self.mu_init: float = mu_init
@@ -72,8 +51,9 @@ class PEPG():
         self.best_mu = None
         self.best_sigma = None
         self.best_theta = None
-
-        self.optimizer = optimizer(theta_size, alpha=mu_lr)
+            
+        assert issubclass(optimizer, Optimizer)
+        self.optimizer = optimizer(mu_lr, **optimizer_kwargs)
 
     def get_parameters(self) -> List[List[float]]:
         self.epsilon = np.random.normal(
@@ -82,20 +62,20 @@ class PEPG():
         self.theta = np.concatenate([self.mu + self.epsilon, self.mu - self.epsilon])
         return self.theta
 
-    def update(self, results):
-        idx = np.argmax(results)
-        if results[idx] > self.best_fitness:
+    def update(self, rewards):
+        idx = np.argmax(rewards)
+        if rewards[idx] > self.best_fitness:
             self.best_mu = self.mu
             self.best_sigma = self.sigma
             self.best_theta = self.theta[idx]
-            self.best_fitness = results[idx]
+            self.best_fitness = rewards[idx]
 
-        results = fitness_transformation(results)
-        baseline = np.mean(results)
+        rewards = fitness_transformation(rewards)
+        baseline = np.mean(rewards)
         batch = int(self.population_size/2)
         s = ((self.epsilon ** 2) - (self.sigma ** 2)) / self.sigma
-        rt = results[:batch] - results[batch:]
-        rs = ((results[:batch] + results[batch:]) / 2 - baseline)
+        rt = rewards[:batch] - rewards[batch:]
+        rs = ((rewards[:batch] + rewards[batch:]) / 2 - baseline)
         mu_g = np.dot(self.epsilon.T, rt) / self.population_size
         self.mu += self.optimizer(-mu_g + self.l2_coeff * self.mu)
         self.sigma += self.sigma_lr * np.dot(s.T, rs) / self.population_size
@@ -103,8 +83,18 @@ class PEPG():
 
     def save_checkpoint(self):
         import time
+        import pathlib
+        import os
+        import inspect
+        frame = inspect.stack()[1]
+        module = inspect.getmodule(frame[0])
+        folder = pathlib.Path(
+            f"{os.path.join(os.path.dirname(module.__file__), 'checkpoints')}")
+        folder.mkdir(parents=True, exist_ok=True)
         filename = f'{int(time.time())}.checkpoint'
-        with open(filename, 'wb') as output:
+        save_path = os.path.abspath(os.path.join(folder, filename))
+        print(f'Saving checkpoint: {save_path}')
+        with open(os.path.join(folder, filename), 'wb') as output:
             pickle.dump(self.__dict__, output, -1)
 
     @classmethod

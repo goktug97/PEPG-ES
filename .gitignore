@@ -1,0 +1,10 @@
+__pycache__
+dist
+build
+*.egg-info
+*.checkpoint
+.mypy_cache
+mypy.ini
+*.json
+*.mp4
+checkpoints
