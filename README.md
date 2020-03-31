@@ -9,6 +9,7 @@ Python Implementation of Parameter-exploring Policy Gradients <a href="#sehnke20
 
 ### Optional
 * gym
+* mpi4py
 
 ## Install
 

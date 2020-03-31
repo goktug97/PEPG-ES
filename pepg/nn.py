@@ -1,4 +1,4 @@
-
+import pickle
 from typing import Callable, List
 
 import numpy as np
@@ -63,3 +63,15 @@ class NeuralNetwork(object):
                       self.sizes[len(self.sizes)-1])
         output = self.output_activation(output @ w)
         return output
+
+    def save_network(self, filename):
+        with open(filename, 'wb') as output:
+            pickle.dump(self.__dict__, output, -1)
+
+    @classmethod
+    def load_network(cls, filename):
+        with open(filename, 'rb') as f:
+            cls_dict = pickle.load(f)
+        network = cls.__new__(cls)
+        network.__dict__.update(cls_dict)
+        return network

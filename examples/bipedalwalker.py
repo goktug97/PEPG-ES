@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import gym
 gym.logger.set_level(40)
@@ -10,7 +12,7 @@ network = NeuralNetwork(env.observation_space.shape[0],
                         env.action_space.shape[0],
                         [64, 64], hidden_activation = np.tanh)
 
-es = PEPG(population_size = 5, theta_size = network.number_of_parameters,
+es = PEPG(population_size = 128, theta_size = network.number_of_parameters,
           mu_init = 0.0, sigma_init = 2.0,
           mu_lr = 0.3, sigma_lr = 0.2)
 
@@ -18,6 +20,7 @@ try:
     while True:
         solutions = es.get_parameters()
         rewards = []
+        prev_time = time.time()
         print(f'Step: {es.step}')
         for solution in solutions:
             network.weights = solution
@@ -30,7 +33,9 @@ try:
                 total_reward += reward
             rewards.append(total_reward)
         es.update(rewards)
-        print(f'Max Reward Session: {es.best_fitness}, Max Reward Step: {max(rewards)}')
+        print(f'Step Took: {time.time() - prev_time} seconds')
+        print(f'Max Reward Session: {es.best_fitness}')
+        print(f'Max Reward Step: {np.max(rewards)}')
 except KeyboardInterrupt:
     env = gym.wrappers.Monitor(env, '.', force = True)
     observation = env.reset()
