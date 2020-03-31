@@ -8,12 +8,11 @@ import numpy as np
 
 from .optimizers import Adam, Optimizer
 
-
 @lru_cache(maxsize=1)
 def utility_function(population_size: int) -> List[float]:
     utility = np.clip(
         np.log(population_size/2 + 1) -
-        np.log(np.arange(1, population_size+1)),
+        np.log(np.arange(population_size, 0, -1)),
         0, None)
     utility /= np.sum(
         np.clip(np.log(population_size/2 + 1) -
@@ -22,11 +21,24 @@ def utility_function(population_size: int) -> List[float]:
     utility -= 1 / population_size
     return utility
 
+@lru_cache(maxsize=1)
+def center_function(population_size: int) -> List[float]:
+    centers = np.arange(0, population_size)
+    centers = centers / (population_size - 1)
+    centers -= 0.5
+    return centers
+
+def compute_ranks(fitness_scores):
+    fitness_scores = np.array(fitness_scores)
+    ranks = np.empty(fitness_scores.size, dtype=int)
+    ranks[fitness_scores.argsort()] = np.arange(fitness_scores.size)
+    return ranks
+
 def fitness_transformation(fitness_scores: List[float]) -> List[float]:
-    ranks = np.argsort(fitness_scores)[::-1]
+    ranks = compute_ranks(fitness_scores)
     population_size = len(fitness_scores)
-    utility = utility_function(population_size)
-    return utility[ranks]
+    values = center_function(population_size)
+    return values[ranks]
 
 
 class PEPG():

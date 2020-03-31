@@ -12,7 +12,7 @@ network = NeuralNetwork(env.observation_space.shape[0],
                         env.action_space.shape[0],
                         [64, 64], hidden_activation = np.tanh)
 
-es = PEPG(population_size = 128, theta_size = network.number_of_parameters,
+es = PEPG(population_size = 256, theta_size = network.number_of_parameters,
           mu_init = 0.0, sigma_init = 2.0,
           mu_lr = 0.3, sigma_lr = 0.2)
 

@@ -162,7 +162,7 @@ ___
 es = PEPG.load_checkpoint(cls, filename)
 ```
 
-- Creates new PEPG class and loads the checkpoint.
+- Creates a new PEPG class and loads the checkpoint.
 ___
 
 ``` python
@@ -197,6 +197,21 @@ NeuralNetwork(self, input_size, output_size, hidden_sizes = [],
     - **hidden_activation:** Callable[[float], float]: Activation function used in hidden layers.
     - **output_activation:** Callable[[float], float]: Activation function used at the output.
     - **bias:** bool: Add bias node.
+___
+
+``` python
+self.save_network(self, filename)
+```
+
+- Save the network to a file.
+
+___
+
+``` python
+network = NeuralNetwork.load_network(cls, filename)
+```
+
+- Creates a new NeuralNetwork class and loads the given network file.
     
 ### Custom Optimizer Example
 
@@ -221,8 +236,6 @@ es = PEPG(population_size = 100, theta_size = network.number_of_parameters,
           mu_lr = 0.3, sigma_lr = 0.2, optimizer = CustomOptimizer,
           optimizer_kwargs = optimizer_kwargs)
 ```
-
-
 
 ## References
 1. <a id="wierstra14a"></a>Daan Wierstra, Tom Schaul, Tobias Glasmachers, Yi Sun, Jan Peters and Jurgen Schmidhuber. Natural Evolution Strategies. 2014
