@@ -94,14 +94,30 @@ while True:
 * Output:
 
 ``` bash
-Step: 233
-Step: 234
-Step: 235
-Step: 236
-Step: 237
+Step: 0
+Step: 1
+Step: 2
+Step: 3
+Step: 4
+Step: 5
+Step: 6
+Step: 7
+Step: 8
+Step: 9
+Step: 10
+Step: 11
+Step: 12
+Step: 13
+Step: 14
+Step: 15
+Step: 16
+Step: 17
+Step: 18
+Step: 19
+Step: 20
 Solution Found
-Parameters: [ 1.25863047 -0.73151503 -2.53377723  1.01802355  3.02723507  1.23112726
- -2.00288859 -3.66789242  4.56593794]
+Parameters: [ 2.69265669 -2.80113868  2.95878579 -4.21097193 -4.62368205  0.72005261
+ -0.66755995 -2.50694535  0.39457738]
 ```
 
 ## Documentation
