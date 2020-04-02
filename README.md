@@ -3,6 +3,10 @@ Parameter-exploring Policy Gradients
 
 Python Implementation of Parameter-exploring Policy Gradients <a href="#sehnke2010">[3]</a> Evolution Strategy 
 
+![Bipedal](https://raw.githubusercontent.com/goktug97/PEPG-ES/master/bipedal.gif)
+
+Reward: 189.16
+
 ## Requirements
 * Python >= 3.6
 * Numpy
